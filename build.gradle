@@ -1,0 +1,18 @@
+apply plugin: 'groovy'
+apply plugin: 'maven-publish'
+
+group = 'es.danirod'
+version = '0.1.0-SNAPSHOT'
+
+publishing {
+  publications {
+    mavenJava(MavenPublication) {
+      from components.java
+    }
+  }
+}
+
+dependencies {
+  compile gradleApi()
+  compile localGroovy()
+}
