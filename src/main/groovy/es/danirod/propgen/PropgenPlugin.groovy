@@ -4,29 +4,32 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
 
+
+/**
+ * A plugin that can be used to generate .properties files from build.gradle.
+ * @author danirod
+ */
 class PropgenPlugin implements Plugin<Project> {
 
     @Override
     void apply(Project project) {
-        PropertiesExtension ext = project.extensions.create('properties', PropertiesExtension)
+        PropgenExtension ext = project.extensions.create('propgen', PropgenExtension)
 
-        project.task("generateProperties") << {
-            ext.propertyFiles.each { PropertyFileDefinition pfDef ->
-                Properties pInst = new Properties()
-                pfDef.properties.each { name, value ->
-                    pInst.put("$name".toString(), "$value".toString())
-                }
+        Task generateProperties = project.task('generateProperties') << {
+            ext.propertyFiles.each { PropertiesFile prop ->
+                prop.saveProperties()
+            }
+        }
+        generateProperties.description = 'Generate properties file'
 
-                // Make sure that the folder exists. Create it if it does not exists.
-                File locationFolder = new File("$pfDef.location")
-                locationFolder.mkdirs()
-
-                // Write the properties.
-                File propertiesFile = new File(locationFolder, "${pfDef.name}.properties")
-                propertiesFile.withWriter { writer ->
-                    pInst.store(writer, null)
+        Task cleanProperties = project.task('cleanProperties') << {
+            ext.propertyFiles.each { PropertiesFile prop ->
+                File propFile = prop.getFile()
+                if (propFile.exists()) {
+                    propFile.delete()
                 }
             }
         }
+        cleanProperties.description = 'Remove generated properties file'
     }
 }
