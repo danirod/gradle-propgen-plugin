@@ -1,0 +1,53 @@
+apply plugin: 'java'
+apply plugin: 'application'
+
+version = '2.4.1'
+
+sourceCompatibility = 1.6
+mainClassName = 'HelloWorld'
+
+buildscript {
+  repositories {
+    mavenLocal()
+  }
+  dependencies {
+    classpath 'es.danirod:gradle-propgen-plugin:0.1.0-SNAPSHOT'
+  }
+}
+
+apply plugin: 'es.danirod.propgen'
+
+sourceSets.main {
+  java.srcDirs = [ 'src/main/java' ]
+  resources.srcDirs = [ 'src/main/resources' ]
+}
+
+jar {
+    manifest {
+        attributes("Implementation-Title": "Gradle",
+                   "Implementation-Version": version,
+                   "Main-Class": mainClassName)
+    }
+}
+
+task wrapper(type: Wrapper) {
+  gradleVersion = '2.8'
+}
+
+propgen {
+  defaultLocation = 'src/main/resources'
+
+  // This generates a bundle named build in the default location.
+  file("build") {
+    property "build.version", project.version
+    property "build.date", new Date().toString()
+  }
+
+  // This generates a bundle named custom in a custom location.
+  file("custom") {
+    location = 'src/test/resources'
+    property "test.report", "true"
+  }
+}
+
+compileJava.dependsOn(generateProperties)
