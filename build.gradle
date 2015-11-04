@@ -12,6 +12,10 @@ publishing {
   }
 }
 
+task wrapper(type: Wrapper) {
+  gradleVersion = '2.8'
+}
+
 dependencies {
   compile gradleApi()
   compile localGroovy()
