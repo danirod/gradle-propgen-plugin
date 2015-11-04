@@ -13,25 +13,15 @@ class PropertiesFile {
     def location
 
     /** The list of properties inside this properties file. */
-    Map<String, String> props = new HashMap<>()
+    Properties props = new Properties()
 
     PropertiesFile(String name, String location) {
         this.name = name
         this.location = location
     }
 
-    /**
-     * Add the given properties to this bundle
-     * @param properties properties to add to the bundle
-     */
-    def void property(Map<String, String> properties) {
-        props.putAll(properties)
-    }
-
-    def Properties generateProperties() {
-        Properties prop = new Properties()
-        prop.putAll(props)
-        prop
+    def void property(String name, String value) {
+        props.put(name, value)
     }
 
     def File getFile() {
@@ -39,10 +29,9 @@ class PropertiesFile {
     }
 
     def File saveProperties() {
-        Properties prop = generateProperties()
         File propFile = getFile()
         propFile.parentFile.mkdirs()
-        propFile.withOutputStream { os -> prop.store(os, null) }
+        propFile.withOutputStream { os -> props.store(os, null) }
     }
 
 }
